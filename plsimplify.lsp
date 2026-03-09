@@ -1,16 +1,16 @@
 (defun c:PLSIMPLIFY ( / ent obj coords pts angLim radLim i
                         p0 p1 p2 v1 v2 dot len1 len2 ang deviation
-                        badIdx ans idx cosang)
+                        badIdx ans idx cosang arr newPts newCoords)
 
   (vl-load-com)
 
 ;; ===================================================================
   (defun acos (x)
-  (cond
-    ((>= x 1.0) 0.0)
-    ((<= x -1.0) pi)
-    (T (atan (sqrt (abs (- 1.0 (* x x)))) x))
-  )
+    (cond
+      ((>= x 1.0) 0.0)
+      ((<= x -1.0) pi)
+      (T (atan (sqrt (abs (- 1.0 (* x x)))) x))
+    )
   )
 
   ;; vector length
@@ -50,10 +50,13 @@
     )
   )
 
-  ;; angle input
-  (setq angLim (getreal "\nEnter minimum angle (degrees): "))
-  (if (null angLim) (exit))
+  ;; ===============================================================
+  ;; angle input (default = 1 degree)
+  (setq angLim (getreal "\nEnter minimum angle (degrees) <1>: "))
+  (if (null angLim) (setq angLim 1.0))
+
   (setq radLim (* pi (/ angLim 180.0)))
+  ;; ===============================================================
 
   ;; get coordinates
   (setq coords (vlax-get obj 'Coordinates))
@@ -105,11 +108,12 @@
 
   (princ (strcat "\nVertices found: " (itoa (length badIdx))))
 
-  ;; delete vertices if confirmed
+  ;; ===============================================================
+  ;; default answer = Y
   (if (> (length badIdx) 0)
     (progn
-      (setq ans (getstring "\nDelete these vertices? (Y/N): "))
-      (if (= (strcase ans) "Y")
+      (setq ans (getstring "\nDelete these vertices? [Y/N] <Y>: "))
+      (if (or (= ans "") (= (strcase ans) "Y"))
 
         ;; rebuild coordinate list without bad vertices
         (progn
@@ -123,6 +127,7 @@
             )
             (setq i (1+ i))
           )
+
           (setq newPts (reverse newPts))
           ;; convert to coordinate array
           (setq newCoords '())
