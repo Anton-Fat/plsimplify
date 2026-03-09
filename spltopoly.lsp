@@ -18,11 +18,11 @@
   ;; loop through selected splines
   (repeat (sslength ss)
     (setq i (1+ i))
-    (command "_SPLINEEDIT" (ssname ss i) "_P" "1")
+    (command "_.splinedit" (ssname ss i) "_P" "1")
   )
 
   ;; update drawing
-  (command "_REGENALL")
+  (command "_regenall")
 
   (princ "\nSelected splines converted to polylines.")
   (princ)
